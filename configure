@@ -1,0 +1,47 @@
+#!/bin/sh
+
+type pkg-config >/dev/null
+
+if [ $? != "0" ]; then
+	echo "You must install pkg-config to be able to run this script"
+	exit
+fi
+
+CFLAGS=`pkg-config --cflags gtk+-2.0 geany`
+CLIBS=`pkg-config --libs gtk+-2.0 geany`
+OBJS=`ls src/*.c | sed -e "s/\.c/.o/"`
+SRC=`ls src/*.c`
+TARGET=gregex
+
+rm Makefile
+cat << EOF >> Makefile
+CFLAGS=$CFLAGS
+CLIBS=$CLIBS
+OBJS=$OBJS
+SRC=$SRC
+CC=gcc -g -Wall
+TARGET=$TARGET
+
+all: $OBJS
+	\$(CC) \$(CLIBS) \$(OBJS) -o \$(TARGET)
+
+clean:
+	rm -f src/*.o gregex
+
+install:
+	mkdir -p /usr/local/lib/geany
+	cp \$(TARGET) /usr/local/lib/geany/\$(TARGET)
+	chmod 755 /usr/local/lib/geany/\$(TARGET)
+uninstall:
+	rm -f /usr/local/lib/geany/\$(TARGET)
+
+deinstall:
+	rm -f /usr/local/lib/geany/\$(TARGET)
+
+EOF
+
+for i in $OBJS; do
+	CFILE=`echo $i | sed -e "s/\.o/.c/"`
+	echo "$i: $CFILE" >> Makefile
+	echo "\t\$(CC) \$(CFLAGS)-c $CFILE -o $i\n" >> Makefile
+done

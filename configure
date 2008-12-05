@@ -7,11 +7,11 @@ if [ $? != "0" ]; then
 	exit
 fi
 
-CFLAGS=`pkg-config --cflags gtk+-2.0 geany`
-CLIBS=`pkg-config --libs gtk+-2.0 geany`
+CFLAGS=`pkg-config --cflags gtk+-2.0`
+CLIBS=`pkg-config --libs gtk+-2.0`
 OBJS=`ls src/*.c | sed -e "s/\.c/.o/"`
 SRC=`ls src/*.c`
-TARGET=gregex
+TARGET=rexpert
 
 rm Makefile
 cat << EOF >> Makefile

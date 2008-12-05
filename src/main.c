@@ -3,6 +3,7 @@
 #include <gtk/gtk.h>
 #include <libintl.h>
 #include <locale.h>
+#include <pcre.h>
 
 #define _ gettext
 #define IS_CHECKED(x) (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(x)))
@@ -44,9 +45,9 @@ void create_interface ()
 	// main window stuff
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
-	gtk_window_set_title(GTK_WINDOW(window), _("G-Regex"));
+	gtk_window_set_title(GTK_WINDOW(window), _("Re Xpert"));
 	gtk_container_set_border_width(GTK_CONTAINER(window), 2);
-	gtk_widget_set_size_request(window, 500, 530);
+	gtk_widget_set_size_request(window, 400, 530);
 
 	g_signal_connect(G_OBJECT(window), "delete-event", G_CALLBACK(on_window_delete_event), NULL);
 

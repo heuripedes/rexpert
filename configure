@@ -9,8 +9,8 @@ fi
 
 CFLAGS=`pkg-config --cflags gtk+-2.0`
 CLIBS=`pkg-config --libs gtk+-2.0`
-OBJS=`ls src/*.c | sed -e "s/\.c/.o/"`
-SRC=`ls src/*.c`
+OBJS=`ls src/*.c | sed -e "s/\.c/.o/" | tr -s "\n" " "`
+SRC=`ls src/*.c | tr -s "\n" " "`
 TARGET=rexpert
 
 rm Makefile

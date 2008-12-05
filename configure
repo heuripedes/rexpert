@@ -1,17 +1,57 @@
 #!/bin/sh
 
-type pkg-config >/dev/null
+TARGET=rexpert
+TARGET_DIR=/usr/local
+SOURCE_DIR=src
+
+search_dir ()
+{
+	for i in $@; do
+		if [ -d $i ]; then
+			exit 0
+		fi
+	done
+	exit 0
+}
+
+search_file ()
+{
+	for i in $@; do
+		if [ -f $i ]; then
+			return 0
+		fi
+	done
+	return 1
+}
+
+echo -n "Checking for pkg-config..."
+
+search_file /usr/bin/pkg-config /usr/local/bin/pkg-config
+
+if [ $? -eq 1 ]; then
+	echo "not found"
+	echo "ERROR: This script requires pkg-config instaled"
+	exit
+else
+	echo "found"
+fi
+
+echo -n "Checking for gtk+ 2.0 headers..."
+
+pkg-config --cflags gtk+-2.0 1>&- 2>&-
 
 if [ $? != "0" ]; then
-	echo "You must install pkg-config to be able to run this script"
+	echo "not found"
+	echo "ERROR: rexpert requires gtk+ 2.0 headers to compile"
 	exit
+else
+	echo "found"
 fi
 
 CFLAGS=`pkg-config --cflags gtk+-2.0`
 CLIBS=`pkg-config --libs gtk+-2.0`
-OBJS=`ls src/*.c | sed -e "s/\.c/.o/" | tr -s "\n" " "`
-SRC=`ls src/*.c | tr -s "\n" " "`
-TARGET=rexpert
+OBJS=`ls $SOURCEDIR/*.c | sed -e "s/\.c/.o/" | tr -s "\n" " "`
+SRC=`ls $SOURCEDIR/*.c | tr -s "\n" " "`
 
 rm Makefile
 cat << EOF >> Makefile
@@ -21,17 +61,19 @@ OBJS=$OBJS
 SRC=$SRC
 CC=gcc -g -Wall
 TARGET=$TARGET
+TARGET_DIR=$TARGET_DIR
 
 all: $OBJS
 	\$(CC) \$(CLIBS) \$(OBJS) -o \$(TARGET)
 
 clean:
-	rm -f src/*.o gregex
+	rm -f $SOURCEDIR/*.o gregex
 
 install:
-	mkdir -p /usr/local/lib/geany
-	cp \$(TARGET) /usr/local/lib/geany/\$(TARGET)
-	chmod 755 /usr/local/lib/geany/\$(TARGET)
+	mkdir -p \$(TARGET_DIR)
+	cp \$(TARGET) \$(TARGET_DIR)
+	chmod 755 \$(TARGET_DIR)/\$(TARGET)
+
 uninstall:
 	rm -f /usr/local/lib/geany/\$(TARGET)
 
@@ -45,3 +87,4 @@ for i in $OBJS; do
 	echo "$i: $CFILE" >> Makefile
 	echo "\t\$(CC) \$(CFLAGS)-c $CFILE -o $i\n" >> Makefile
 done
+

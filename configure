@@ -1,9 +1,5 @@
 #!/bin/sh
 
-TARGET=rexpert
-TARGET_DIR=/usr/local
-SOURCE_DIR=src
-
 search_dir ()
 {
 	for i in $@; do
@@ -24,6 +20,42 @@ search_file ()
 	return 1
 }
 
+TARGET=rexpert
+TARGET_DIR=/usr/local
+SOURCE_DIR=src
+RELEASE_BUILD=0
+
+show_usage ()
+{
+	echo "Usage: $0 [commands]"
+	echo "Commands are:"
+	echo "\t-p<path> - Path to install rexpert files. Default: /usr/local"
+	echo "\t-r       - Build optimized version of rexpert"
+	echo "\t-h       - This help"
+}
+
+
+while getopts 'p:rh': opt; do
+	case $opt in
+	p)
+		TARGET_DIR=$OPTARG
+		echo $TARGET_DIR
+		exit
+	;;
+	r)
+		RELEASE_BUILD=1
+	;;
+	h)
+		show_usage
+		exit
+	;;
+	?)
+		show_usage
+		exit
+	;;
+	esac
+done
+
 echo -n "Checking for pkg-config..."
 
 search_file /usr/bin/pkg-config /usr/local/bin/pkg-config
@@ -40,7 +72,7 @@ echo -n "Checking for gtk+ 2.0 headers..."
 
 pkg-config --cflags gtk+-2.0 1>&- 2>&-
 
-if [ $? != "0" ]; then
+if [ $? -ne "0" ]; then
 	echo "not found"
 	echo "ERROR: rexpert requires gtk+ 2.0 headers to compile"
 	exit
@@ -50,8 +82,15 @@ fi
 
 CFLAGS=`pkg-config --cflags gtk+-2.0`
 CLIBS=`pkg-config --libs gtk+-2.0`
-OBJS=`ls $SOURCEDIR/*.c | sed -e "s/\.c/.o/" | tr -s "\n" " "`
-SRC=`ls $SOURCEDIR/*.c | tr -s "\n" " "`
+OBJS=`ls $SOURCE_DIR/*.c | sed -e "s/\.c/.o/" | tr -s "\n" " "`
+SRC=`ls $SOURCE_DIR/*.c | tr -s "\n" " "`
+
+if [ $RELEASE_BUILD -eq 1 ]; then
+	BUILDFLAGS=-O2
+else
+	BUILDFLAGS=-g
+fi
+
 
 rm Makefile
 cat << EOF >> Makefile
@@ -59,7 +98,7 @@ CFLAGS=$CFLAGS
 CLIBS=$CLIBS
 OBJS=$OBJS
 SRC=$SRC
-CC=gcc -g -Wall
+CC=gcc $BUILDFLAGS -Wall
 TARGET=$TARGET
 TARGET_DIR=$TARGET_DIR
 
@@ -67,7 +106,7 @@ all: $OBJS
 	\$(CC) \$(CLIBS) \$(OBJS) -o \$(TARGET)
 
 clean:
-	rm -f $SOURCEDIR/*.o gregex
+	rm -f $SOURCE_DIR/*.o \$(TARGET)
 
 install:
 	mkdir -p \$(TARGET_DIR)
@@ -75,10 +114,7 @@ install:
 	chmod 755 \$(TARGET_DIR)/\$(TARGET)
 
 uninstall:
-	rm -f /usr/local/lib/geany/\$(TARGET)
-
-deinstall:
-	rm -f /usr/local/lib/geany/\$(TARGET)
+	rm -f \$(TARGET_DIR)/\$(TARGET)
 
 EOF
 
@@ -87,4 +123,9 @@ for i in $OBJS; do
 	echo "$i: $CFILE" >> Makefile
 	echo "\t\$(CC) \$(CFLAGS)-c $CFILE -o $i\n" >> Makefile
 done
+
+
+
+echo 
+echo "Run 'make' to compile rexpert"
 

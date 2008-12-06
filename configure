@@ -92,7 +92,7 @@ else
 fi
 
 
-rm Makefile
+rm -f Makefile
 cat << EOF >> Makefile
 CFLAGS=$CFLAGS
 CLIBS=$CLIBS
@@ -126,6 +126,6 @@ done
 
 
 
-echo 
+echo
 echo "Run 'make' to compile rexpert"
 

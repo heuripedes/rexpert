@@ -12,6 +12,8 @@ void create_main_ui ()
 	GtkWidget *hbox1,   *hbox2,   *hbox3;
 	GtkWidget *scroll1, *scroll2;
 	GtkWidget *label1,  *label2;
+	GtkWidget *align1;
+	PangoFontDescription *fdesk1;
 
 	// main window stuff
 	main_ui.window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -30,16 +32,22 @@ void create_main_ui ()
 	gtk_misc_set_alignment(GTK_MISC(label1), 0, 0.5);
 
 	// regex input text box
-	scroll1    = gtk_scrolled_window_new(NULL, NULL);
+	scroll1 = gtk_scrolled_window_new(NULL, NULL);
+	fdesk1   = pango_font_description_from_string("monospace 9");
 	main_ui.view_regex = gtk_text_view_new();
+
 
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll1), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll1), main_ui.view_regex);
 	gtk_box_pack_start(GTK_BOX(vbox1), scroll1, TRUE, TRUE, 0);
 
+	gtk_widget_modify_font(main_ui.view_regex, fdesk1);
+	pango_font_description_free(fdesk1);
+
 	// regex modifiers and regex status message
-	hbox2 = gtk_hbox_new(FALSE, 0);
-	hbox1 = gtk_hbox_new(TRUE, 0);
+	hbox2 = gtk_hbox_new(TRUE, 0);
+	hbox1 = gtk_hbox_new(FALSE, 0);
+	align1 = gtk_alignment_new(1,0.5,0,1);
 	main_ui.lbl_regex = gtk_label_new("");
 	main_ui.chk_mod_i = gtk_check_button_new_with_label("i");
 	main_ui.chk_mod_m = gtk_check_button_new_with_label("m");
@@ -52,7 +60,8 @@ void create_main_ui ()
 	gtk_box_pack_start(GTK_BOX(hbox1), main_ui.lbl_regex, TRUE, TRUE,   0);
 	gtk_misc_set_alignment(GTK_MISC(main_ui.lbl_regex), 0, 0.5);
 
-	gtk_box_pack_start(GTK_BOX(hbox1), hbox2,             FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox1), align1,            FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(align1), hbox2);
 	gtk_box_pack_start(GTK_BOX(hbox2), main_ui.chk_mod_i, FALSE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox2), main_ui.chk_mod_m, FALSE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox2), main_ui.chk_mod_s, FALSE, FALSE, 0);
@@ -65,12 +74,17 @@ void create_main_ui ()
 	gtk_box_pack_start(GTK_BOX(vbox1), label2,   FALSE, FALSE, 0);
 
 	// target text input box
-	scroll2             = gtk_scrolled_window_new(NULL, NULL);
+	scroll2 = gtk_scrolled_window_new(NULL, NULL);
+	fdesk1   = pango_font_description_from_string("monospace 9");
 	main_ui.view_target = gtk_text_view_new();
+
 
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll2), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll2), main_ui.view_target);
 	gtk_box_pack_start(GTK_BOX(vbox1), scroll2, TRUE, TRUE, 0);
+
+	gtk_widget_modify_font(main_ui.view_target, fdesk1);
+	pango_font_description_free(fdesk1);
 
 	// regex result status text (target)
 	main_ui.lbl_target = gtk_label_new("");

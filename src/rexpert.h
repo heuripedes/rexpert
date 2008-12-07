@@ -15,7 +15,19 @@
 #define _ gettext
 
 
+// FOR FUTURE IMPLEMENTATION
+/*
+typedef struct RexpertApp
+{
+	RexpertMainUi main_ui;
+	RexpertConfig config;
+}
+RexpertApp;
 
+void rexpert_app_init ();
+void rexpert_app_shutdown (RexpertApp *rexpert);
+void rexpert_app_load_config (RexpertApp *rexpert);
 
+*/
 
 #endif

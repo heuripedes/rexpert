@@ -31,6 +31,7 @@ void on_btn_testre_clicked (GtkButton* btn, gpointer data)
 	int options = 0;
 	int rc;
 	int ovector[OVECOUNTER];
+	int i;
 
 	regex  = get_gtk_text_view_text(GTK_TEXT_VIEW(main_ui.view_regex));
 	target = get_gtk_text_view_text(GTK_TEXT_VIEW(main_ui.view_target));
@@ -74,9 +75,18 @@ void on_btn_testre_clicked (GtkButton* btn, gpointer data)
 	}
 
 	msg = (gchar*)g_malloc(sizeof(gchar*) * (strlen(_("%i matches found")) + 4 ));
-	g_sprintf(msg, _("%i matches found"), rc);
+	g_sprintf(msg, _("%i matches found"), (rc-1));
 	gtk_label_set_text(GTK_LABEL(main_ui.lbl_target), msg);
 	g_free(msg);
+	
+	
+	clear_all_tags(GTK_TEXT_VIEW(main_ui.view_target));
+	
+	for ( i = 1; i < rc; i++ )
+	{
+		set_gtk_text_view_tag_by_offset_and_name(GTK_TEXT_VIEW(main_ui.view_target), ovector[i*2], ovector[i*2+1], (i % 2 ? "matched_text0" : "matched_text1"));
+	}
+
 }
 
 void on_btn_graph_clicked (GtkButton* btn, gpointer data)

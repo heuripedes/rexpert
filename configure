@@ -47,14 +47,18 @@ while getopts 'p:rh': opt; do
 	;;
 	h)
 		show_usage
-		exit
+		exit 0
 	;;
 	?)
 		show_usage
-		exit
+		exit 1
 	;;
 	esac
 done
+
+echo 
+echo "Checking environment..."
+echo
 
 echo -n "Checking for pkg-config..."
 
@@ -63,25 +67,46 @@ search_file /usr/bin/pkg-config /usr/local/bin/pkg-config
 if [ $? -eq 1 ]; then
 	echo "not found"
 	echo "ERROR: This script requires pkg-config instaled"
-	exit
+	exit e
 else
 	echo "found"
 fi
 
-echo -n "Checking for gtk+ 2.0 headers..."
+#echo -n "Checking for libpcre..."
 
-pkg-config --cflags gtk+-2.0 1>&- 2>&-
+#pkg-config --cflags gtk+-2.0 1>&- 2>&-
 
-if [ $? -ne "0" ]; then
-	echo "not found"
-	echo "ERROR: rexpert requires gtk+ 2.0 headers to compile"
-	exit
-else
-	echo "found"
+#if [ $? -ne "0" ]; then
+#	echo "not found"
+#	echo "ERROR: rexpert requires libpcre instaled to compile"
+#	exit 1 
+#else
+#	echo "found"
+#fi
+
+REQUIRED_PKGS="gtk+-2.0 libpcre glib-2.0 pango atk gdk-2.0"
+MISSING_REQUIRED=0
+for i in $REQUIRED_PKGS; do
+	echo -n "Checking for required package $i ... "
+	if [ `pkg-config --exists $i` ]; then
+		echo "not found"
+		MISSING_REQUIRED=1
+	else
+		echo "found"
+	fi
+done
+
+if [ $MISSING_REQUIRED -eq 1 ]; then
+	echo "ERROR: Some required packages are missing."
+	echo "Install the packages and run this script again"
+	exit 1
 fi
 
-CFLAGS=`pkg-config --cflags gtk+-2.0`
-CLIBS=`pkg-config --libs gtk+-2.0`
+echo
+echo -n "Creating Makefile..."
+
+CFLAGS=`pkg-config --cflags $REQUIRED_PKGS`
+CLIBS=`pkg-config --libs $REQUIRED_PKGS`
 OBJS=`ls $SOURCE_DIR/*.c | sed -e "s/\.c/.o/" | tr -s "\n" " "`
 SRC=`ls $SOURCE_DIR/*.c | tr -s "\n" " "`
 
@@ -124,6 +149,7 @@ for i in $OBJS; do
 	echo "\t\$(CC) \$(CFLAGS)-c $CFILE -o $i\n" >> Makefile
 done
 
+echo "done"
 
 
 echo

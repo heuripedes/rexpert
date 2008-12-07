@@ -32,10 +32,9 @@ void create_main_ui ()
 	gtk_misc_set_alignment(GTK_MISC(label1), 0, 0.5);
 
 	// regex input text box
-	scroll1 = gtk_scrolled_window_new(NULL, NULL);
+	scroll1  = gtk_scrolled_window_new(NULL, NULL);
 	fdesk1   = pango_font_description_from_string("monospace 9");
 	main_ui.view_regex = gtk_text_view_new();
-
 
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll1), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll1), main_ui.view_regex);
@@ -77,6 +76,8 @@ void create_main_ui ()
 	scroll2 = gtk_scrolled_window_new(NULL, NULL);
 	fdesk1   = pango_font_description_from_string("monospace 9");
 	main_ui.view_target = gtk_text_view_new();
+	gtk_text_buffer_create_tag(gtk_text_view_get_buffer(GTK_TEXT_VIEW(main_ui.view_target)), "matched_text0", "background", "#FFC0CB", NULL);
+	gtk_text_buffer_create_tag(gtk_text_view_get_buffer(GTK_TEXT_VIEW(main_ui.view_target)), "matched_text1", "background", "#90EE90", NULL);
 
 
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll2), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);

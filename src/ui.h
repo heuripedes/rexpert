@@ -11,6 +11,8 @@ typedef struct RXMainUi
 	GtkWidget *chk_mod_i,  *chk_mod_m, *chk_mod_s, *chk_mod_x, *chk_mod_g;
 	GtkWidget *btn_testre, *btn_graph, *btn_help;
 	GtkWidget *view_regex, *view_target;
+	//GtkTextBuffer   *buffer_regex, *buffer_target;
+	//GtkTextTagTable *tag_table;
 }
 RXMainUi;
 

@@ -14,7 +14,7 @@ AC_PROG_CC
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([libintl.h locale.h string.h pcre.h])
+AC_CHECK_HEADERS([libintl.h locale.h string.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -22,9 +22,19 @@ AC_C_CONST
 # Checks for library functions.
 
 # Checks for packages
-gtk_modules="gtk+-2.0 >= 2.6.0"
+gtk_modules="gtk+-2.0 >= 2.10.0"
 PKG_CHECK_MODULES(GTK, [$gtk_modules])
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
+
+glib_modules="glib-2.0 >= 2.10.0"
+PKG_CHECK_MODULES(glib, [$gtk_modules])
+AC_SUBST(glib_CFLAGS)
+AC_SUBST(glib_LIBS)
+
+pcre_modules="gtk+-2.0 >= 2.6.0"
+PKG_CHECK_MODULES(pcre, [$gtk_modules])
+AC_SUBST(pcre_CFLAGS)
+AC_SUBST(pcre_LIBS)
 
 AC_OUTPUT(Makefile src/Makefile)

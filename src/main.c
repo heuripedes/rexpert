@@ -9,6 +9,15 @@
 #define IS_CHECKED(x) (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(x)))
 #define OVECOUNTER 30
 
+static gboolean ao_version = FALSE;
+static GOptionEntry entries[] = 
+{
+  { "version", 'v', 0, G_OPTION_ARG_NONE, &ao_version, "Display software evrsion", NULL },
+  { NULL }
+};
+
+
+
 
 //////// main ui callbacks
 void on_window_delete_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
@@ -40,7 +49,7 @@ void on_btn_testre_clicked (GtkButton* btn, gpointer data)
 	options += (IS_CHECKED(main_ui.chk_mod_m) ? PCRE_MULTILINE : 0);
 	options += (IS_CHECKED(main_ui.chk_mod_s) ? PCRE_DOTALL    : 0);
 	options += (IS_CHECKED(main_ui.chk_mod_x) ? PCRE_EXTENDED  : 0);
-// i dont know what pcre const represents 'g' modifier. "global" maybe ?
+// i dont know what pcre const represents 'g' modifier.
 //	options += (IS_CHECKED(main_ui.chk_mod_g)?PCRE_*:0);
 
 	re = pcre_compile (regex, options, &error, &erroffset, NULL );
@@ -107,6 +116,7 @@ void connect_main_ui_callbacks ()
 
 int main (int argc, char** argv)
 {
+	// 
 	gtk_init(&argc, &argv);
 	create_main_ui();
 	connect_main_ui_callbacks();

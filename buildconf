@@ -1,5 +1,0 @@
-#!/bin/sh
-rm -f aclocal.m4
-aclocal
-automake --add-missing
-autoconf

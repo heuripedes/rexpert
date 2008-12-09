@@ -1,123 +1,46 @@
+/*
+ *      ui_utils.c
+ *
+ *      Copyright 2008 Higor Eurípedes <heuripedes@gmail.com>
+ *      Copyright 2008 Felipe Pena     <@gmail.com>
+ *
+ *      This program is free software; you can redistribute it and/or modify
+ *      it under the terms of the GNU General Public License as published by
+ *      the Free Software Foundation; either version 2 of the License, or
+ *      (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU General Public License for more details.
+ *
+ *      You should have received a copy of the GNU General Public License
+ *      along with this program; if not, write to the Free Software
+ *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ *      MA 02110-1301, USA.
+ */
 
-// ui_utils.c
 
-#include "rexpert.h"
-#include "ui_utils.h"
-#include <string.h>
+RexpertMainWidgets main_widgets;
 
-gchar * get_gtk_text_view_text (GtkTextView* view)
+void ui_init ()
 {
-	GtkTextBuffer *buffer;
-	GtkTextIter *start;
-	GtkTextIter *end;
-	gchar * text;
+	main_widgets.window = create_main_window ();
 
-	start = g_new(GtkTextIter, 1);
-	end   = g_new(GtkTextIter, 1);
-	text = g_malloc0(0);
+	/* Text boxes */
+	main_widgets.tv_pattern = lookup_widget ( main_widgets.window, "tv_pattern" );
+	main_widgets.tv_subject = lookup_widget ( main_widgets.window, "tv_subject" );
 
-	buffer = gtk_text_view_get_buffer(view);
+	/* Modifier check buttons */
+	main_widgets.chk_mod_g  = lookup_widget ( main_widgets.window, "chk_mod_g" );
+	main_widgets.chk_mod_i  = lookup_widget ( main_widgets.window, "chk_mod_i" );
+	main_widgets.chk_mod_m  = lookup_widget ( main_widgets.window, "chk_mod_m" );
+	main_widgets.chk_mod_s  = lookup_widget ( main_widgets.window, "chk_mod_s" );
+	main_widgets.chk_mod_x  = lookup_widget ( main_widgets.window, "chk_mod_g" );
 
-	gtk_text_buffer_get_start_iter(buffer, start);
-	gtk_text_buffer_get_end_iter(buffer, end);
+	/* Status labels */
+	main_widgets.lbl_pattern_status = lookup_widget ( main_widgets.window, "lbl_pattern_status" );
+	main_widgets.lbl_subject_status = lookup_widget ( main_widgets.window, "lbl_subject_status" );
 
-	text = gtk_text_buffer_get_text(buffer, start, end, FALSE);
-
-	g_free(start);
-	g_free(end);
-
-	return text;
+	gtk_widget_show (main_widgets.window);
 }
-
-gchar * get_gtk_text_view_text_by_offset (GtkTextView* view, guint start_offset, guint end_offset)
-{
-	GtkTextBuffer *buffer;
-	GtkTextIter *start;
-	GtkTextIter *end;
-	gchar * text;
-
-	start = g_new(GtkTextIter, 1);
-	end   = g_new(GtkTextIter, 1);
-	text  = g_malloc0(0);
-
-	buffer = gtk_text_view_get_buffer(view);
-
-	gtk_text_buffer_get_iter_at_offset(buffer, start, start_offset);
-	
-	if ( end_offset < 0 )
-	{
-		gtk_text_buffer_get_end_iter(buffer, end);
-	}
-	else
-	{
-		gtk_text_buffer_get_iter_at_offset(buffer, end, end_offset);
-	}
-	
-	text = gtk_text_buffer_get_text(buffer, start, end, FALSE);
-
-	g_free(start);
-	g_free(end);
-
-	return text;
-}
-
-void set_gtk_text_view_tag_by_offset_and_name (GtkTextView* view, guint start_offset, guint end_offset, gchar *name)
-{
-	GtkTextBuffer *buffer;
-	GtkTextIter *start;
-	GtkTextIter *end;
-
-	start = g_new(GtkTextIter, 1);
-	end   = g_new(GtkTextIter, 1);
-
-	buffer = gtk_text_view_get_buffer(view);
-
-	gtk_text_buffer_get_iter_at_offset(buffer, start, start_offset);
-	
-	if ( end_offset < 0 )
-	{
-		gtk_text_buffer_get_end_iter(buffer, end);
-	}
-	else
-	{
-		gtk_text_buffer_get_iter_at_offset(buffer, end, end_offset);
-	}
-	
-	gtk_text_buffer_apply_tag_by_name(buffer, name, start, end);
-}
-
-void clear_all_tags (GtkTextView* view)
-{
-	GtkTextBuffer *buffer;
-	GtkTextIter *start;
-	GtkTextIter *end;
-	
-	start = g_new(GtkTextIter, 1);
-	end   = g_new(GtkTextIter, 1);
-
-	buffer = gtk_text_view_get_buffer(view);
-	
-	gtk_text_buffer_get_start_iter(buffer, start);
-	gtk_text_buffer_get_end_iter(buffer, end);
-	gtk_text_buffer_remove_all_tags(buffer, start, end);
-	g_free(start);
-	g_free(end);
-}
-
-void set_gtk_text_view_text (GtkTextView* view, gchar* text)
-{
-	GtkTextBuffer *buffer;
-	buffer = gtk_text_view_get_buffer(view);
-	gtk_text_buffer_set_text(buffer, text, strlen(text));
-}
-
-void set_gtk_text_view_cursor_position (GtkTextView* view, int offset)
-{
-	GtkTextBuffer *buffer;
-	GtkTextIter* iter;
-	buffer = gtk_text_view_get_buffer(view);
-	gtk_text_buffer_get_iter_at_offset(buffer, iter, offset);
-	gtk_widget_grab_focus(GTK_WIDGET(view));
-	gtk_text_buffer_place_cursor(buffer, iter);
-}
-

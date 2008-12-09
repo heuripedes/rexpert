@@ -23,6 +23,7 @@
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
+  <signal name="delete_event" handler="gtk_main_quit" last_modification_time="Tue, 09 Dec 2008 19:13:11 GMT"/>
 
   <child>
     <widget class="GtkVBox" id="vbox1">
@@ -31,10 +32,10 @@
       <property name="spacing">0</property>
 
       <child>
-	<widget class="GtkVPaned" id="vpaned1">
+	<widget class="GtkVBox" id="vbox4">
 	  <property name="visible">True</property>
-	  <property name="can_focus">True</property>
-	  <property name="position">0</property>
+	  <property name="homogeneous">False</property>
+	  <property name="spacing">0</property>
 
 	  <child>
 	    <widget class="GtkVBox" id="vbox2">
@@ -63,7 +64,7 @@
 		<packing>
 		  <property name="padding">0</property>
 		  <property name="expand">False</property>
-		  <property name="fill">False</property>
+		  <property name="fill">True</property>
 		</packing>
 	      </child>
 
@@ -71,8 +72,8 @@
 		<widget class="GtkScrolledWindow" id="scrolledwindow1">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
-		  <property name="hscrollbar_policy">GTK_POLICY_ALWAYS</property>
-		  <property name="vscrollbar_policy">GTK_POLICY_ALWAYS</property>
+		  <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+		  <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
 		  <property name="shadow_type">GTK_SHADOW_IN</property>
 		  <property name="window_placement">GTK_CORNER_TOP_LEFT</property>
 
@@ -176,7 +177,7 @@
 			  <child>
 			    <widget class="GtkCheckButton" id="chk_mod_m">
 			      <property name="visible">True</property>
-			      <property name="tooltip" translatable="yes">Multi line pattern matching</property>
+			      <property name="tooltip" translatable="yes">Multiline pattern matching</property>
 			      <property name="can_focus">True</property>
 			      <property name="label" translatable="yes">m</property>
 			      <property name="use_underline">True</property>
@@ -268,8 +269,9 @@
 	      </child>
 	    </widget>
 	    <packing>
-	      <property name="shrink">True</property>
-	      <property name="resize">False</property>
+	      <property name="padding">0</property>
+	      <property name="expand">True</property>
+	      <property name="fill">True</property>
 	    </packing>
 	  </child>
 
@@ -300,7 +302,7 @@
 		<packing>
 		  <property name="padding">0</property>
 		  <property name="expand">False</property>
-		  <property name="fill">False</property>
+		  <property name="fill">True</property>
 		</packing>
 	      </child>
 
@@ -308,8 +310,8 @@
 		<widget class="GtkScrolledWindow" id="scrolledwindow2">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
-		  <property name="hscrollbar_policy">GTK_POLICY_ALWAYS</property>
-		  <property name="vscrollbar_policy">GTK_POLICY_ALWAYS</property>
+		  <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+		  <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
 		  <property name="shadow_type">GTK_SHADOW_IN</property>
 		  <property name="window_placement">GTK_CORNER_TOP_LEFT</property>
 
@@ -366,8 +368,9 @@
 	      </child>
 	    </widget>
 	    <packing>
-	      <property name="shrink">True</property>
-	      <property name="resize">True</property>
+	      <property name="padding">0</property>
+	      <property name="expand">True</property>
+	      <property name="fill">True</property>
 	    </packing>
 	  </child>
 	</widget>

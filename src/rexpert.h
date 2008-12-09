@@ -25,9 +25,9 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
-#include <glib/gprintf.hdis>
+#include <glib/gprintf.h>
 #include <gtk/gtk.h>
-#include <pcre.h>
+
 
 #ifndef HAVE_REXPERT_H
 #define HAVE_REXPERT_H
@@ -36,7 +36,7 @@
 #include "support.h"
 #include "ui_utils.h"
 
-typedef struct
+typedef struct 
 {
 	gboolean debug;
 }

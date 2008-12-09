@@ -34,6 +34,11 @@ RexpertMainWidgets;
 
 extern RexpertMainWidgets main_widgets;
 
-void ui_init ();
+#define IS_CHECKED(x) (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(x)))
+
+void   ui_init ();
+gchar *get_text_view_text (GtkTextView *view);
+void   set_text_view_tag_by_offset_and_name (GtkTextView* view, guint start_offset, guint end_offset, gchar *name);
+void   clear_text_view_tags (GtkTextView* view) ;
 
 #endif /* HAVE_UI_UTILS_H */

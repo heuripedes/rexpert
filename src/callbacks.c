@@ -1,79 +1,84 @@
-#ifdef HAVE_CONFIG_H
-#  include <config.h>
-#endif
 
-#include <gtk/gtk.h>
+#include "rexpert.h"
+#include <string.h>
+#include <pcre.h>
 
-#include "callbacks.h"
-#include "interface.h"
-#include "support.h"
-
+#define MAX_RESULTS 30
 
 void on_btn_test_pattern_clicked (GtkButton *button, gpointer user_data)
 {
-	/*pcre *re;
-	gchar *msg;
-	gchar *regex;
-	gchar *target;
+	pcre       *regex;
+	gchar      *message;
+	gchar      *pattern;
+	gchar      *subject;
 	const char *error;
 	int erroffset;
 	int options = 0;
-	int rc;
-	int ovector[OVECOUNTER];
+	int result_count;
+	int result_vector[MAX_RESULTS];
 	int i;
 
-	regex  = get_gtk_text_view_text(GTK_TEXT_VIEW(main_ui.view_regex));
-	target = get_gtk_text_view_text(GTK_TEXT_VIEW(main_ui.view_target));
+	subject = get_text_view_text(GTK_TEXT_VIEW(main_widgets.tv_subject));
+	pattern = get_text_view_text(GTK_TEXT_VIEW(main_widgets.tv_pattern));
+	
+	options += (IS_CHECKED(main_widgets.chk_mod_i) ? PCRE_CASELESS  : 0);
+	options += (IS_CHECKED(main_widgets.chk_mod_m) ? PCRE_MULTILINE : 0);
+	options += (IS_CHECKED(main_widgets.chk_mod_s) ? PCRE_DOTALL    : 0);
+	options += (IS_CHECKED(main_widgets.chk_mod_x) ? PCRE_EXTENDED  : 0);
+//	options += (IS_CHECKED(main_widgets.chk_mod_g) ? PCRE_          : 0);
 
-	options += (IS_CHECKED(main_ui.chk_mod_i) ? PCRE_CASELESS  : 0);
-	options += (IS_CHECKED(main_ui.chk_mod_m) ? PCRE_MULTILINE : 0);
-	options += (IS_CHECKED(main_ui.chk_mod_s) ? PCRE_DOTALL    : 0);
-	options += (IS_CHECKED(main_ui.chk_mod_x) ? PCRE_EXTENDED  : 0);
-// i dont know what pcre const represents 'g' modifier.
-//	options += (IS_CHECKED(main_ui.chk_mod_g)?PCRE_*:0);
-
-	re = pcre_compile (regex, options, &error, &erroffset, NULL );
-
-	if ( re == NULL )
+	regex = pcre_compile (pattern, options, &error, &erroffset, NULL);
+	
+	if ( regex == NULL )
 	{
-		msg = (gchar*)g_malloc(sizeof(gchar*) * (strlen(_("Error: %s")) + strlen(_(error))));
-		g_sprintf(msg, _("Error: %s"), error);
-		gtk_label_set_text(GTK_LABEL(main_ui.lbl_regex), msg);
+		message = g_new(gchar, (strlen(_("Error: %s")) + strlen(_(error))));
+		g_sprintf(message, _("Error: %s"), error);
+		gtk_label_set_text(GTK_LABEL(main_widgets.lbl_pattern_status), message);
 		//set_gtk_text_view_cursor_position(GTK_TEXT_VIEW(main_ui.view_regex), erroffset);
-		g_free(msg);
+		g_free(message);
 		return;
 	}
-
-	rc = pcre_exec (re, NULL, target, (int)strlen(target), 0, 0, ovector, OVECOUNTER);
-
-	if ( rc < 0 )
+	
+	result_count = pcre_exec (regex, NULL, subject, (int)strlen(subject), 0, 0, result_vector, MAX_RESULTS);
+	
+	if ( result_count < 0 )
 	{
-		switch ( rc )
+		switch ( result_count )
 		{
 			case PCRE_ERROR_NOMATCH:
-				gtk_label_set_text(GTK_LABEL(main_ui.lbl_target), _("No match found"));
+				gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), _("No match found"));
 				break;
 			case PCRE_ERROR_NOMEMORY:
-				gtk_label_set_text(GTK_LABEL(main_ui.lbl_target), _("No enought memory avaliable"));
+				gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), _("No enought memory avaliable"));
 				break;
 			default:
-				gtk_label_set_text(GTK_LABEL(main_ui.lbl_target), _("Unknown error"));
+				gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), _("Unknown error"));
 				break;
 		}
 		return;
 	}
-
-	msg = (gchar*)g_malloc(sizeof(gchar*) * (strlen(_("%i matches found")) + 4 ));
-	g_sprintf(msg, _("%i matches found"), (rc-1));
-	gtk_label_set_text(GTK_LABEL(main_ui.lbl_target), msg);
-	g_free(msg);
-
-
-	clear_all_tags(GTK_TEXT_VIEW(main_ui.view_target));
-
-	for ( i = 1; i < rc; i++ )
+	
+	if ( !(result_count - 1) )
 	{
-		set_gtk_text_view_tag_by_offset_and_name(GTK_TEXT_VIEW(main_ui.view_target), ovector[i*2], ovector[i*2+1], (i % 2 ? "matched_text0" : "matched_text1"));
-	}*/
+		message = g_new(gchar, (strlen(_("No matches found.")) ));
+		g_sprintf(message, _("No matches found."));
+		gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), message);
+		g_free(message);
+	}
+	else
+	{
+		message = g_new(gchar, (strlen(_("%i matches found between offsets %i and %i")) + 16)); /* 16 = 4 for each integer */
+		g_sprintf(message, _("%i matches found between offsets %i and %i."), (result_count-1), result_vector[0], result_vector[1]);
+		gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), message);
+		g_free(message);
+	}
+	
+	clear_text_view_tags(GTK_TEXT_VIEW(main_widgets.tv_subject));
+
+	for ( i = 1; i < result_count; i++ )
+	{
+		set_text_view_tag_by_offset_and_name(GTK_TEXT_VIEW(main_widgets.tv_subject), \
+			result_vector[i*2], result_vector[i*2+1], (i % 2 ? "matched_text0" : "matched_text1"));
+	}
 }
 

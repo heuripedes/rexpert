@@ -31,7 +31,7 @@ create_main_window (void)
 {
   GtkWidget *main_window;
   GtkWidget *vbox1;
-  GtkWidget *vpaned1;
+  GtkWidget *vbox4;
   GtkWidget *vbox2;
   GtkWidget *lbl_pattern;
   GtkWidget *scrolledwindow1;
@@ -73,27 +73,27 @@ create_main_window (void)
   gtk_widget_show (vbox1);
   gtk_container_add (GTK_CONTAINER (main_window), vbox1);
 
-  vpaned1 = gtk_vpaned_new ();
-  gtk_widget_set_name (vpaned1, "vpaned1");
-  gtk_widget_show (vpaned1);
-  gtk_box_pack_start (GTK_BOX (vbox1), vpaned1, TRUE, TRUE, 0);
-  gtk_paned_set_position (GTK_PANED (vpaned1), 0);
+  vbox4 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_set_name (vbox4, "vbox4");
+  gtk_widget_show (vbox4);
+  gtk_box_pack_start (GTK_BOX (vbox1), vbox4, TRUE, TRUE, 0);
 
   vbox2 = gtk_vbox_new (FALSE, 0);
   gtk_widget_set_name (vbox2, "vbox2");
   gtk_widget_show (vbox2);
-  gtk_paned_pack1 (GTK_PANED (vpaned1), vbox2, FALSE, TRUE);
+  gtk_box_pack_start (GTK_BOX (vbox4), vbox2, TRUE, TRUE, 0);
 
   lbl_pattern = gtk_label_new (_("Pattern:"));
   gtk_widget_set_name (lbl_pattern, "lbl_pattern");
   gtk_widget_show (lbl_pattern);
-  gtk_box_pack_start (GTK_BOX (vbox2), lbl_pattern, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox2), lbl_pattern, FALSE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (lbl_pattern), 0, 0.5);
 
   scrolledwindow1 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_set_name (scrolledwindow1, "scrolledwindow1");
   gtk_widget_show (scrolledwindow1);
   gtk_box_pack_start (GTK_BOX (vbox2), scrolledwindow1, TRUE, TRUE, 0);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow1), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow1), GTK_SHADOW_IN);
 
   tv_pattern = gtk_text_view_new ();
@@ -132,7 +132,7 @@ create_main_window (void)
   gtk_widget_set_name (chk_mod_m, "chk_mod_m");
   gtk_widget_show (chk_mod_m);
   gtk_box_pack_start (GTK_BOX (hbox2), chk_mod_m, TRUE, TRUE, 0);
-  gtk_tooltips_set_tip (tooltips, chk_mod_m, _("Multi line pattern matching"), NULL);
+  gtk_tooltips_set_tip (tooltips, chk_mod_m, _("Multiline pattern matching"), NULL);
 
   chk_mod_s = gtk_check_button_new_with_mnemonic (_("s"));
   gtk_widget_set_name (chk_mod_s, "chk_mod_s");
@@ -153,18 +153,19 @@ create_main_window (void)
   vbox3 = gtk_vbox_new (FALSE, 0);
   gtk_widget_set_name (vbox3, "vbox3");
   gtk_widget_show (vbox3);
-  gtk_paned_pack2 (GTK_PANED (vpaned1), vbox3, TRUE, TRUE);
+  gtk_box_pack_start (GTK_BOX (vbox4), vbox3, TRUE, TRUE, 0);
 
   lbl_subject = gtk_label_new (_("Subject text:"));
   gtk_widget_set_name (lbl_subject, "lbl_subject");
   gtk_widget_show (lbl_subject);
-  gtk_box_pack_start (GTK_BOX (vbox3), lbl_subject, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox3), lbl_subject, FALSE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (lbl_subject), 0, 0.5);
 
   scrolledwindow2 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_set_name (scrolledwindow2, "scrolledwindow2");
   gtk_widget_show (scrolledwindow2);
   gtk_box_pack_start (GTK_BOX (vbox3), scrolledwindow2, TRUE, TRUE, 0);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow2), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow2), GTK_SHADOW_IN);
 
   tv_subject = gtk_text_view_new ();
@@ -209,6 +210,9 @@ create_main_window (void)
   GTK_WIDGET_SET_FLAGS (btn_close, GTK_CAN_DEFAULT);
   gtk_tooltips_set_tip (tooltips, btn_close, _("Click to close the application"), NULL);
 
+  g_signal_connect ((gpointer) main_window, "delete_event",
+                    G_CALLBACK (gtk_main_quit),
+                    NULL);
   g_signal_connect ((gpointer) btn_test_pattern, "clicked",
                     G_CALLBACK (on_btn_test_pattern_clicked),
                     NULL);
@@ -219,7 +223,7 @@ create_main_window (void)
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (main_window, main_window, "main_window");
   GLADE_HOOKUP_OBJECT (main_window, vbox1, "vbox1");
-  GLADE_HOOKUP_OBJECT (main_window, vpaned1, "vpaned1");
+  GLADE_HOOKUP_OBJECT (main_window, vbox4, "vbox4");
   GLADE_HOOKUP_OBJECT (main_window, vbox2, "vbox2");
   GLADE_HOOKUP_OBJECT (main_window, lbl_pattern, "lbl_pattern");
   GLADE_HOOKUP_OBJECT (main_window, scrolledwindow1, "scrolledwindow1");

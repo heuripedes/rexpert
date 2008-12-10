@@ -34,6 +34,7 @@
 
 #include "interface.h"
 #include "support.h"
+#include "callbacks.h"
 #include "ui_utils.h"
 
 typedef struct 

@@ -65,6 +65,7 @@ create_main_window (void)
   gtk_widget_set_name (main_window, "main_window");
   gtk_widget_set_size_request (main_window, 400, 450);
   gtk_container_set_border_width (GTK_CONTAINER (main_window), 3);
+  gtk_widget_set_events (main_window, GDK_FOCUS_CHANGE_MASK);
   gtk_window_set_title (GTK_WINDOW (main_window), _("Rexpert"));
   gtk_window_set_default_size (GTK_WINDOW (main_window), 400, 450);
 

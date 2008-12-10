@@ -2,7 +2,7 @@
 
 SUBDIRS = src po
 
-EXTRA_DIST = \
+EXTRA_DIST = config.rpath m4/ChangeLog  \
 	autogen.sh \
 	rexpert.glade \
 	rexpert.gladep
@@ -28,3 +28,5 @@ dist-hook:
 	  done \
 	fi
 
+
+ACLOCAL_AMFLAGS = -I m4

@@ -1,3 +1,24 @@
+/*
+ *      callbacks.c
+ *
+ *      Copyright 2008 Higor Eurípedes <heuripedes@gmail.com>
+ *      Copyright 2008 Felipe Pena     <@gmail.com>
+ *
+ *      This program is free software; you can redistribute it and/or modify
+ *      it under the terms of the GNU General Public License as published by
+ *      the Free Software Foundation; either version 2 of the License, or
+ *      (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU General Public License for more details.
+ *
+ *      You should have received a copy of the GNU General Public License
+ *      along with this program; if not, write to the Free Software
+ *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ *      MA 02110-1301, USA.
+ */
 
 #include "rexpert.h"
 #include <string.h>
@@ -34,10 +55,13 @@ void on_btn_test_pattern_clicked (GtkButton *button, gpointer user_data)
 		message = g_new(gchar, (strlen(_("Error: %s")) + strlen(_(error))));
 		g_sprintf(message, _("Error: %s"), error);
 		gtk_label_set_text(GTK_LABEL(main_widgets.lbl_pattern_status), message);
+		set_text_view_tag_by_offset_and_name(GTK_TEXT_VIEW(main_widgets.tv_pattern), erroffset-1, -1, "error_text");
+		g_printf("%i\n", erroffset);
 		//set_gtk_text_view_cursor_position(GTK_TEXT_VIEW(main_ui.view_regex), erroffset);
 		g_free(message);
 		return;
 	}
+	gtk_label_set_text(GTK_LABEL(main_widgets.lbl_pattern_status), _("No errors found."));
 	
 	result_count = pcre_exec (regex, NULL, subject, (int)strlen(subject), 0, 0, result_vector, MAX_RESULTS);
 	
@@ -46,13 +70,13 @@ void on_btn_test_pattern_clicked (GtkButton *button, gpointer user_data)
 		switch ( result_count )
 		{
 			case PCRE_ERROR_NOMATCH:
-				gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), _("No match found"));
+				gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), _("No match found."));
 				break;
 			case PCRE_ERROR_NOMEMORY:
-				gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), _("No enought memory avaliable"));
+				gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), _("No enought memory avaliable."));
 				break;
 			default:
-				gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), _("Unknown error"));
+				gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), _("Unknown error."));
 				break;
 		}
 		return;
@@ -81,4 +105,6 @@ void on_btn_test_pattern_clicked (GtkButton *button, gpointer user_data)
 			result_vector[i*2], result_vector[i*2+1], (i % 2 ? "matched_text0" : "matched_text1"));
 	}
 }
+
+
 

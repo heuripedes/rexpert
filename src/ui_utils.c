@@ -24,9 +24,25 @@
 
 RexpertMainWidgets main_widgets;
 
+void auto_clear_tags (GtkWidget *widget, gpointer user_data)
+{
+	GtkTextIter *start; 
+	GtkTextIter *end;
+	
+	start = g_new(GtkTextIter, 1); 
+	end   = g_new(GtkTextIter, 1); 
+	
+	gtk_text_buffer_get_start_iter(GTK_TEXT_BUFFER(widget), start); 
+	gtk_text_buffer_get_end_iter(GTK_TEXT_BUFFER(widget), end); 
+	gtk_text_buffer_remove_all_tags(GTK_TEXT_BUFFER(widget), start, end); 
+	g_free(start); 
+	g_free(end);
+}
+
 void ui_init ()
 {
 	PangoFontDescription *font_desc1;
+	GtkTextBuffer *text_buffer1;
 	
 	main_widgets.window = create_main_window ();
 
@@ -46,11 +62,16 @@ void ui_init ()
 	main_widgets.lbl_subject_status = lookup_widget ( main_widgets.window, "lbl_subject_status" );
 	
 	/* Error highlighting tags */
-	gtk_text_buffer_create_tag(gtk_text_view_get_buffer(GTK_TEXT_VIEW(main_widgets.tv_subject)), "error_text", "background", "#FF3A3A", NULL); 
+	gtk_text_buffer_create_tag(gtk_text_view_get_buffer(GTK_TEXT_VIEW(main_widgets.tv_pattern)), "error_text", "background", "#FF3A3A", NULL); 
 	
 	/* Match highlighting tags */
 	gtk_text_buffer_create_tag(gtk_text_view_get_buffer(GTK_TEXT_VIEW(main_widgets.tv_subject)), "matched_text0", "background", "#FFC0CB", NULL); 
 	gtk_text_buffer_create_tag(gtk_text_view_get_buffer(GTK_TEXT_VIEW(main_widgets.tv_subject)), "matched_text1", "background", "#90EE90", NULL);
+	
+	/* Connect the callback that auto-cleans the text tags */
+	text_buffer1 = gtk_text_view_get_buffer(GTK_TEXT_VIEW(main_widgets.tv_pattern));
+	g_signal_connect ((gpointer) text_buffer1, "changed", G_CALLBACK (auto_clear_tags), NULL);
+	//g_object_connect(gtk_text_view_get_buffer(GTK_TEXT_VIEW(main_widgets.tv_subject)), "changed", auto_clear_tags);
 	
 	/* Show the main window */
 	gtk_widget_show (main_widgets.window);
@@ -94,11 +115,11 @@ void set_text_view_tag_by_offset_and_name (GtkTextView* view, guint start_offset
 	 
 	if ( end_offset < 0 ) 
 	{ 
-			gtk_text_buffer_get_end_iter(buffer, end); 
+		gtk_text_buffer_get_end_iter(buffer, end); 
 	} 
 	else 
 	{ 
-			gtk_text_buffer_get_iter_at_offset(buffer, end, end_offset); 
+		gtk_text_buffer_get_iter_at_offset(buffer, end, end_offset); 
 	} 
 	 
 	gtk_text_buffer_apply_tag_by_name(buffer, name, start, end); 

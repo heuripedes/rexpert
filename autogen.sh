@@ -6,6 +6,28 @@ test -z "$srcdir" && srcdir=.
 
 DIE=0
 
+attempt_command () {
+    IGNORE=$1
+    shift
+
+    echo "Running $@ ..."
+    ERR="`$@ 2>&1`"
+    errcode=$?
+    if [ "x$IGNORE" = "x" ]; then
+        ERR=`echo "$ERR"`
+    else
+        ERR=`echo "$ERR" | egrep -v "$IGNORE"`
+    fi
+    if [ "x$ERR" != "x" ]; then
+        echo "$ERR" | awk '{print "  " $0}'
+    fi
+    if [ $errcode -gt 0 ]; then
+        echo "Please fix the error conditions and try again."
+        exit 1
+    fi
+}
+
+
 if [ -n "$GNOME2_DIR" ]; then
 	ACLOCAL_FLAGS="-I $GNOME2_DIR/share/aclocal $ACLOCAL_FLAGS"
 	LD_LIBRARY_PATH="$GNOME2_DIR/lib:$LD_LIBRARY_PATH"
@@ -113,12 +135,15 @@ do
       aclocalinclude="$ACLOCAL_FLAGS"
 
       if grep "^AM_GLIB_GNU_GETTEXT" configure.in >/dev/null; then
-	echo "Creating $dr/aclocal.m4 ..."
-	test -r $dr/aclocal.m4 || touch $dr/aclocal.m4
-	echo "Running glib-gettextize...  Ignore non-fatal messages."
-	echo "no" | glib-gettextize --force --copy
-	echo "Making $dr/aclocal.m4 writable ..."
-	test -r $dr/aclocal.m4 && chmod u+w $dr/aclocal.m4
+		echo "Creating $dr/aclocal.m4 ..."
+		test -r $dr/aclocal.m4 || touch $dr/aclocal.m4
+#		echo "Running glib-gettextize...  Ignore non-fatal messages."
+		attempt_command '^(Please add the files|  codeset|  progtest|from the|or directly|You will also|ftp://ftp.gnu.org|$)' \
+			glib-gettextize --copy --force
+		#echo "no" | glib-gettextize --force --copy
+		echo "Making $dr/aclocal.m4 writable ..."
+		test -r $dr/aclocal.m4 && chmod u+w $dr/aclocal.m4
+
       fi
       if grep "^AC_PROG_INTLTOOL" configure.in >/dev/null; then
         echo "Running intltoolize..."

@@ -53,7 +53,17 @@ create_main_window (void)
   GtkWidget *hbuttonbox1;
   GtkWidget *btn_test_pattern;
   GtkWidget *btn_generate_graphic;
+  GtkWidget *btn_show_panel;
   GtkWidget *btn_close;
+  GtkWidget *ntbk_panel;
+  GtkWidget *vbox5;
+  GtkWidget *table1;
+  GtkWidget *label2;
+  GtkWidget *label3;
+  GtkWidget *combobox1;
+  GtkWidget *combobox2;
+  GtkWidget *label4;
+  GtkWidget *label1;
   GtkAccelGroup *accel_group;
   GtkTooltips *tooltips;
 
@@ -63,11 +73,10 @@ create_main_window (void)
 
   main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_widget_set_name (main_window, "main_window");
-  gtk_widget_set_size_request (main_window, 400, 450);
+  gtk_widget_set_size_request (main_window, 525, 525);
   gtk_container_set_border_width (GTK_CONTAINER (main_window), 3);
   gtk_widget_set_events (main_window, GDK_FOCUS_CHANGE_MASK);
   gtk_window_set_title (GTK_WINDOW (main_window), _("Rexpert"));
-  gtk_window_set_default_size (GTK_WINDOW (main_window), 400, 450);
 
   vbox1 = gtk_vbox_new (FALSE, 0);
   gtk_widget_set_name (vbox1, "vbox1");
@@ -184,7 +193,7 @@ create_main_window (void)
   gtk_widget_set_name (hbuttonbox1, "hbuttonbox1");
   gtk_widget_show (hbuttonbox1);
   gtk_box_pack_start (GTK_BOX (vbox1), hbuttonbox1, FALSE, TRUE, 0);
-  gtk_button_box_set_layout (GTK_BUTTON_BOX (hbuttonbox1), GTK_BUTTONBOX_END);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (hbuttonbox1), GTK_BUTTONBOX_EDGE);
 
   btn_test_pattern = gtk_button_new_with_mnemonic (_("Test pattern"));
   gtk_widget_set_name (btn_test_pattern, "btn_test_pattern");
@@ -204,12 +213,72 @@ create_main_window (void)
   GTK_WIDGET_SET_FLAGS (btn_generate_graphic, GTK_CAN_DEFAULT);
   gtk_tooltips_set_tip (tooltips, btn_generate_graphic, _("Click here to generate a graphviz graphic of the results"), NULL);
 
+  btn_show_panel = gtk_button_new_with_mnemonic (_("Show panel"));
+  gtk_widget_set_name (btn_show_panel, "btn_show_panel");
+  gtk_widget_show (btn_show_panel);
+  gtk_container_add (GTK_CONTAINER (hbuttonbox1), btn_show_panel);
+  GTK_WIDGET_SET_FLAGS (btn_show_panel, GTK_CAN_DEFAULT);
+
   btn_close = gtk_button_new_with_mnemonic (_("Close"));
   gtk_widget_set_name (btn_close, "btn_close");
   gtk_widget_show (btn_close);
   gtk_container_add (GTK_CONTAINER (hbuttonbox1), btn_close);
   GTK_WIDGET_SET_FLAGS (btn_close, GTK_CAN_DEFAULT);
   gtk_tooltips_set_tip (tooltips, btn_close, _("Click to close the application"), NULL);
+
+  ntbk_panel = gtk_notebook_new ();
+  gtk_widget_set_name (ntbk_panel, "ntbk_panel");
+  gtk_box_pack_start (GTK_BOX (vbox1), ntbk_panel, FALSE, TRUE, 0);
+
+  vbox5 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_set_name (vbox5, "vbox5");
+  gtk_widget_show (vbox5);
+  gtk_container_add (GTK_CONTAINER (ntbk_panel), vbox5);
+
+  table1 = gtk_table_new (2, 2, FALSE);
+  gtk_widget_set_name (table1, "table1");
+  gtk_widget_show (table1);
+  gtk_box_pack_start (GTK_BOX (vbox5), table1, TRUE, TRUE, 0);
+
+  label2 = gtk_label_new (_("Pattern"));
+  gtk_widget_set_name (label2, "label2");
+  gtk_widget_show (label2);
+  gtk_table_attach (GTK_TABLE (table1), label2, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label2), 0, 0.5);
+
+  label3 = gtk_label_new (_("Subject"));
+  gtk_widget_set_name (label3, "label3");
+  gtk_widget_show (label3);
+  gtk_table_attach (GTK_TABLE (table1), label3, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label3), 0, 0.5);
+
+  combobox1 = gtk_combo_box_new_text ();
+  gtk_widget_set_name (combobox1, "combobox1");
+  gtk_widget_show (combobox1);
+  gtk_table_attach (GTK_TABLE (table1), combobox1, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
+
+  combobox2 = gtk_combo_box_new_text ();
+  gtk_widget_set_name (combobox2, "combobox2");
+  gtk_widget_show (combobox2);
+  gtk_table_attach (GTK_TABLE (table1), combobox2, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
+
+  label4 = gtk_label_new (_("Press test pattern to use this tab"));
+  gtk_widget_set_name (label4, "label4");
+  gtk_widget_show (label4);
+  gtk_box_pack_start (GTK_BOX (vbox5), label4, FALSE, FALSE, 0);
+
+  label1 = gtk_label_new (_("Highlighting"));
+  gtk_widget_set_name (label1, "label1");
+  gtk_widget_show (label1);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (ntbk_panel), gtk_notebook_get_nth_page (GTK_NOTEBOOK (ntbk_panel), 0), label1);
 
   g_signal_connect ((gpointer) main_window, "delete_event",
                     G_CALLBACK (gtk_main_quit),
@@ -246,7 +315,17 @@ create_main_window (void)
   GLADE_HOOKUP_OBJECT (main_window, hbuttonbox1, "hbuttonbox1");
   GLADE_HOOKUP_OBJECT (main_window, btn_test_pattern, "btn_test_pattern");
   GLADE_HOOKUP_OBJECT (main_window, btn_generate_graphic, "btn_generate_graphic");
+  GLADE_HOOKUP_OBJECT (main_window, btn_show_panel, "btn_show_panel");
   GLADE_HOOKUP_OBJECT (main_window, btn_close, "btn_close");
+  GLADE_HOOKUP_OBJECT (main_window, ntbk_panel, "ntbk_panel");
+  GLADE_HOOKUP_OBJECT (main_window, vbox5, "vbox5");
+  GLADE_HOOKUP_OBJECT (main_window, table1, "table1");
+  GLADE_HOOKUP_OBJECT (main_window, label2, "label2");
+  GLADE_HOOKUP_OBJECT (main_window, label3, "label3");
+  GLADE_HOOKUP_OBJECT (main_window, combobox1, "combobox1");
+  GLADE_HOOKUP_OBJECT (main_window, combobox2, "combobox2");
+  GLADE_HOOKUP_OBJECT (main_window, label4, "label4");
+  GLADE_HOOKUP_OBJECT (main_window, label1, "label1");
   GLADE_HOOKUP_OBJECT_NO_REF (main_window, tooltips, "tooltips");
 
   gtk_widget_grab_focus (tv_pattern);

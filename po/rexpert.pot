@@ -1,0 +1,135 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-12-11 23:50-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/interface.c:69
+msgid "Rexpert"
+msgstr ""
+
+#: src/interface.c:87
+msgid "Pattern:"
+msgstr ""
+
+#: src/interface.c:110
+msgid "Insert a pcre-compatible pattern"
+msgstr ""
+
+#: src/interface.c:126
+msgid "i"
+msgstr ""
+
+#: src/interface.c:130
+msgid "Caseless pattern matching"
+msgstr ""
+
+#: src/interface.c:132
+msgid "m"
+msgstr ""
+
+#: src/interface.c:136
+msgid "Multiline pattern matching"
+msgstr ""
+
+#: src/interface.c:138
+msgid "s"
+msgstr ""
+
+#: src/interface.c:143
+msgid "x"
+msgstr ""
+
+#: src/interface.c:147
+msgid "Extended pattern matching"
+msgstr ""
+
+#: src/interface.c:149
+msgid "g"
+msgstr ""
+
+#: src/interface.c:159
+msgid "Subject text:"
+msgstr ""
+
+#: src/interface.c:177
+msgid "Insert a text to be tested against the pattern"
+msgstr ""
+
+#: src/interface.c:189
+msgid "Test pattern"
+msgstr ""
+
+#: src/interface.c:194
+msgid "Click here to test the pattern"
+msgstr ""
+
+#: src/interface.c:199
+msgid "Generate graphic"
+msgstr ""
+
+#: src/interface.c:205
+msgid "Click here to generate a graphviz graphic of the results"
+msgstr ""
+
+#: src/interface.c:207
+msgid "Close"
+msgstr ""
+
+#: src/interface.c:212
+msgid "Click to close the application"
+msgstr ""
+
+#: src/callbacks.c:55 src/callbacks.c:56
+#, c-format
+msgid "Error: %s"
+msgstr ""
+
+#: src/callbacks.c:64
+msgid "No errors found."
+msgstr ""
+
+#: src/callbacks.c:73
+msgid "No match found."
+msgstr ""
+
+#: src/callbacks.c:76
+msgid "No enought memory avaliable."
+msgstr ""
+
+#: src/callbacks.c:79
+msgid "Unknown error."
+msgstr ""
+
+#: src/callbacks.c:87 src/callbacks.c:88
+#, c-format
+msgid "No matches found."
+msgstr ""
+
+#: src/callbacks.c:94
+#, c-format
+msgid "%i matches found between offsets %i and %i"
+msgstr ""
+
+#. 16 = 4 for each integer
+#: src/callbacks.c:95
+#, c-format
+msgid "%i matches found between offsets %i and %i."
+msgstr ""
+
+#: src/support.c:90 src/support.c:114
+#, c-format
+msgid "Couldn't find pixmap file: %s"
+msgstr ""

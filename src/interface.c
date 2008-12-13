@@ -57,11 +57,11 @@ create_main_window (void)
   GtkWidget *btn_close;
   GtkWidget *ntbk_panel;
   GtkWidget *vbox5;
-  GtkWidget *table1;
+  GtkWidget *tbl_highlighting;
   GtkWidget *label2;
   GtkWidget *label3;
-  GtkWidget *combobox1;
-  GtkWidget *combobox2;
+  GtkWidget *cbo_pattern_list;
+  GtkWidget *cbo_substring_list;
   GtkWidget *label4;
   GtkWidget *label1;
   GtkAccelGroup *accel_group;
@@ -73,17 +73,17 @@ create_main_window (void)
 
   main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_widget_set_name (main_window, "main_window");
-  gtk_widget_set_size_request (main_window, 525, 525);
+  gtk_widget_set_size_request (main_window, 516, 525);
   gtk_container_set_border_width (GTK_CONTAINER (main_window), 3);
   gtk_widget_set_events (main_window, GDK_FOCUS_CHANGE_MASK);
   gtk_window_set_title (GTK_WINDOW (main_window), _("Rexpert"));
 
-  vbox1 = gtk_vbox_new (FALSE, 0);
+  vbox1 = gtk_vbox_new (FALSE, 3);
   gtk_widget_set_name (vbox1, "vbox1");
   gtk_widget_show (vbox1);
   gtk_container_add (GTK_CONTAINER (main_window), vbox1);
 
-  vbox4 = gtk_vbox_new (FALSE, 0);
+  vbox4 = gtk_vbox_new (FALSE, 5);
   gtk_widget_set_name (vbox4, "vbox4");
   gtk_widget_show (vbox4);
   gtk_box_pack_start (GTK_BOX (vbox1), vbox4, TRUE, TRUE, 0);
@@ -235,38 +235,39 @@ create_main_window (void)
   gtk_widget_show (vbox5);
   gtk_container_add (GTK_CONTAINER (ntbk_panel), vbox5);
 
-  table1 = gtk_table_new (2, 2, FALSE);
-  gtk_widget_set_name (table1, "table1");
-  gtk_widget_show (table1);
-  gtk_box_pack_start (GTK_BOX (vbox5), table1, TRUE, TRUE, 0);
+  tbl_highlighting = gtk_table_new (2, 2, FALSE);
+  gtk_widget_set_name (tbl_highlighting, "tbl_highlighting");
+  gtk_widget_show (tbl_highlighting);
+  gtk_box_pack_start (GTK_BOX (vbox5), tbl_highlighting, TRUE, TRUE, 0);
+  gtk_table_set_col_spacings (GTK_TABLE (tbl_highlighting), 12);
 
   label2 = gtk_label_new (_("Pattern"));
   gtk_widget_set_name (label2, "label2");
   gtk_widget_show (label2);
-  gtk_table_attach (GTK_TABLE (table1), label2, 0, 1, 0, 1,
+  gtk_table_attach (GTK_TABLE (tbl_highlighting), label2, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label2), 0, 0.5);
 
-  label3 = gtk_label_new (_("Subject"));
+  label3 = gtk_label_new (_("Substring"));
   gtk_widget_set_name (label3, "label3");
   gtk_widget_show (label3);
-  gtk_table_attach (GTK_TABLE (table1), label3, 0, 1, 1, 2,
+  gtk_table_attach (GTK_TABLE (tbl_highlighting), label3, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label3), 0, 0.5);
 
-  combobox1 = gtk_combo_box_new_text ();
-  gtk_widget_set_name (combobox1, "combobox1");
-  gtk_widget_show (combobox1);
-  gtk_table_attach (GTK_TABLE (table1), combobox1, 1, 2, 0, 1,
+  cbo_pattern_list = gtk_combo_box_new_text ();
+  gtk_widget_set_name (cbo_pattern_list, "cbo_pattern_list");
+  gtk_widget_show (cbo_pattern_list);
+  gtk_table_attach (GTK_TABLE (tbl_highlighting), cbo_pattern_list, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
 
-  combobox2 = gtk_combo_box_new_text ();
-  gtk_widget_set_name (combobox2, "combobox2");
-  gtk_widget_show (combobox2);
-  gtk_table_attach (GTK_TABLE (table1), combobox2, 1, 2, 1, 2,
+  cbo_substring_list = gtk_combo_box_new_text ();
+  gtk_widget_set_name (cbo_substring_list, "cbo_substring_list");
+  gtk_widget_show (cbo_substring_list);
+  gtk_table_attach (GTK_TABLE (tbl_highlighting), cbo_substring_list, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
 
@@ -286,8 +287,14 @@ create_main_window (void)
   g_signal_connect ((gpointer) btn_test_pattern, "clicked",
                     G_CALLBACK (on_btn_test_pattern_clicked),
                     NULL);
+  g_signal_connect ((gpointer) btn_show_panel, "clicked",
+                    G_CALLBACK (on_btn_show_panel_clicked),
+                    NULL);
   g_signal_connect ((gpointer) btn_close, "clicked",
                     G_CALLBACK (gtk_main_quit),
+                    NULL);
+  g_signal_connect ((gpointer) cbo_substring_list, "changed",
+                    G_CALLBACK (on_cbo_substring_list_changed),
                     NULL);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
@@ -319,11 +326,11 @@ create_main_window (void)
   GLADE_HOOKUP_OBJECT (main_window, btn_close, "btn_close");
   GLADE_HOOKUP_OBJECT (main_window, ntbk_panel, "ntbk_panel");
   GLADE_HOOKUP_OBJECT (main_window, vbox5, "vbox5");
-  GLADE_HOOKUP_OBJECT (main_window, table1, "table1");
+  GLADE_HOOKUP_OBJECT (main_window, tbl_highlighting, "tbl_highlighting");
   GLADE_HOOKUP_OBJECT (main_window, label2, "label2");
   GLADE_HOOKUP_OBJECT (main_window, label3, "label3");
-  GLADE_HOOKUP_OBJECT (main_window, combobox1, "combobox1");
-  GLADE_HOOKUP_OBJECT (main_window, combobox2, "combobox2");
+  GLADE_HOOKUP_OBJECT (main_window, cbo_pattern_list, "cbo_pattern_list");
+  GLADE_HOOKUP_OBJECT (main_window, cbo_substring_list, "cbo_substring_list");
   GLADE_HOOKUP_OBJECT (main_window, label4, "label4");
   GLADE_HOOKUP_OBJECT (main_window, label1, "label1");
   GLADE_HOOKUP_OBJECT_NO_REF (main_window, tooltips, "tooltips");

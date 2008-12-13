@@ -24,3 +24,11 @@ void
 on_btn_test_pattern_clicked            (GtkButton       *button,
                                         gpointer         user_data);
 
+
+void
+on_btn_show_panel_clicked              (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_cbo_substring_list_changed          (GtkComboBox     *combobox,
+                                        gpointer         user_data);

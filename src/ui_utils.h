@@ -29,12 +29,14 @@ typedef struct
 	GtkWidget *tv_pattern, *tv_subject;
 	GtkWidget *chk_mod_i, *chk_mod_m, *chk_mod_s, *chk_mod_x, *chk_mod_g;
 	GtkWidget *lbl_pattern_status, *lbl_subject_status;
+	GtkWidget *ntbk_panel;
 }
 RexpertMainWidgets;
 
 extern RexpertMainWidgets main_widgets;
 
 #define IS_CHECKED(x) (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(x)))
+#define GET_MAIN_WIDGET(x) lookup_widget(main_widgets.window, x)
 
 void   ui_init ();
 gchar *get_text_view_text (GtkTextView *view);

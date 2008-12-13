@@ -37,7 +37,7 @@
 #include "callbacks.h"
 #include "ui_utils.h"
 
-typedef struct 
+typedef struct
 {
 	gboolean debug;
 }
@@ -45,6 +45,18 @@ CommandLineOptions;
 
 extern CommandLineOptions cl_options;
 
+#define G_VALUE_NEW_STRING(x, y) \
+	x = g_new0(GValue, 1); \
+	g_value_init(x, G_TYPE_STRING); \
+	g_value_set_string(x, y);
 
+#define G_VALUE_NEW_INT(x, y) \
+	x = g_new0(GValue, 1); \
+	g_value_init(x, G_TYPE_INT); \
+	g_value_set_int(x, y);
+
+#define G_VALUE_FREE(x) \
+	g_value_unset(x); \
+	g_free(x);
 
 #endif /* HAVE_REXPERT_H */

@@ -26,28 +26,38 @@
 
 #define MAX_RESULTS 30
 
+struct _PcreData
+{
+	gchar      *pattern;
+	gchar      *subject;
+	const char *error;
+	int         erroffset;
+	int         options;
+	int         result_count;
+	int         result_arr[MAX_RESULTS];
+};
+
+static struct _PcreData re_data;
+
 //////////////////////////// Helper funcs
 
-void populate_substring_highlight_list (int rc, int result_vector[])
+void populate_substring_highlight_list ()
 {
-	gchar *subject;
 	gchar *str;
 	GtkTreeModel *model;
 	GtkTreeIter  *iter;
 	GtkWidget  *cbo;
 	GValue *gvalue;
-	PcreResult *pr;
 
 	const char  **strlist;
 	int   list_length;
 	int   status;
 	int   i = 0;
 
-	subject = get_text_view_text(GTK_TEXT_VIEW(main_widgets.tv_subject));
 	cbo     = GET_MAIN_WIDGET("cbo_substring_list");
 	model   = gtk_combo_box_get_model(GTK_COMBO_BOX(cbo));
 
-	status  = pcre_get_substring_list (subject, result_vector, rc, &strlist);
+	status  = pcre_get_substring_list (re_data.subject, re_data.result_arr, re_data.result_count, &strlist);
 
 	switch ( status )
 	{
@@ -59,7 +69,7 @@ void populate_substring_highlight_list (int rc, int result_vector[])
 	gtk_list_store_clear(GTK_LIST_STORE(model));
 
 	str = g_new (gchar, strlen(_("[%i - %i]: All substrings")) + 8);
-	g_sprintf(str, _("[%i - %i]: All substrings"), result_vector[0], result_vector[1]);
+	g_sprintf(str, _("[%i - %i]: All substrings"), re_data.result_arr[0], re_data.result_arr[1]);
 
 	iter = g_new(GtkTreeIter, 1);
 	gtk_list_store_append(GTK_LIST_STORE(model), iter);
@@ -68,21 +78,21 @@ void populate_substring_highlight_list (int rc, int result_vector[])
 	gtk_list_store_set_value(GTK_LIST_STORE(model), iter, 0, gvalue);
 	G_VALUE_FREE(gvalue);
 
-	G_VALUE_NEW_INT(gvalue, result_vector[0]);
+	G_VALUE_NEW_INT(gvalue, re_data.result_arr[0]);
 	gtk_list_store_set_value(GTK_LIST_STORE(model), iter, 1, gvalue);
 	G_VALUE_FREE(gvalue);
 
-	G_VALUE_NEW_INT(gvalue, result_vector[1]);
+	G_VALUE_NEW_INT(gvalue, re_data.result_arr[1]);
 	gtk_list_store_set_value(GTK_LIST_STORE(model), iter, 2, gvalue);
 	G_VALUE_FREE(gvalue);
 
 	g_free(iter);
 	g_free(str);
 
-	for ( i = 1; i < rc; i++ )
+	for ( i = 1; i < re_data.result_count; i++ )
 	{
 		str = g_new (gchar, strlen("[%i - %i]: %s") + strlen(strlist[i]) + 8);
-		g_sprintf(str, _("[%i - %i]: %s"), result_vector[i*2], result_vector[i*2+1], strlist[i]);
+		g_sprintf(str, _("[%i - %i]: %s"), re_data.result_arr[i*2], re_data.result_arr[i*2+1], strlist[i]);
 
 		iter = g_new(GtkTreeIter, 1);
 		gtk_list_store_append(GTK_LIST_STORE(model), iter);
@@ -91,11 +101,11 @@ void populate_substring_highlight_list (int rc, int result_vector[])
 		gtk_list_store_set_value(GTK_LIST_STORE(model), iter, 0, gvalue);
 		G_VALUE_FREE(gvalue);
 
-		G_VALUE_NEW_INT(gvalue, result_vector[i*2]);
+		G_VALUE_NEW_INT(gvalue, re_data.result_arr[i*2]);
 		gtk_list_store_set_value(GTK_LIST_STORE(model), iter, 1, gvalue);
 		G_VALUE_FREE(gvalue);
 
-		G_VALUE_NEW_INT(gvalue, result_vector[i*2+1]);
+		G_VALUE_NEW_INT(gvalue, re_data.result_arr[i*2+1]);
 		gtk_list_store_set_value(GTK_LIST_STORE(model), iter, 2, gvalue);
 		G_VALUE_FREE(gvalue);
 
@@ -114,44 +124,38 @@ void on_btn_test_pattern_clicked (GtkButton *button, gpointer user_data)
 {
 	pcre       *regex;
 	gchar      *message;
-	gchar      *pattern;
-	gchar      *subject;
-	const char *error;
-	int erroffset;
-	int options = 0;
-	int result_count;
-	int result_vector[MAX_RESULTS];
 	int i;
 
-	subject = get_text_view_text(GTK_TEXT_VIEW(main_widgets.tv_subject));
-	pattern = get_text_view_text(GTK_TEXT_VIEW(main_widgets.tv_pattern));
+	re_data.subject = get_text_view_text(GTK_TEXT_VIEW(main_widgets.tv_subject));
+	re_data.pattern = get_text_view_text(GTK_TEXT_VIEW(main_widgets.tv_pattern));
 
-	options += (IS_CHECKED(main_widgets.chk_mod_i) ? PCRE_CASELESS  : 0);
-	options += (IS_CHECKED(main_widgets.chk_mod_m) ? PCRE_MULTILINE : 0);
-	options += (IS_CHECKED(main_widgets.chk_mod_s) ? PCRE_DOTALL    : 0);
-	options += (IS_CHECKED(main_widgets.chk_mod_x) ? PCRE_EXTENDED  : 0);
-//	options += (IS_CHECKED(main_widgets.chk_mod_g) ? PCRE_          : 0);
+	re_data.options += (IS_CHECKED(main_widgets.chk_mod_i) ? PCRE_CASELESS  : 0);
+	re_data.options += (IS_CHECKED(main_widgets.chk_mod_m) ? PCRE_MULTILINE : 0);
+	re_data.options += (IS_CHECKED(main_widgets.chk_mod_s) ? PCRE_DOTALL    : 0);
+	re_data.options += (IS_CHECKED(main_widgets.chk_mod_x) ? PCRE_EXTENDED  : 0);
+//	re_data.options += (IS_CHECKED(main_widgets.chk_mod_g) ? PCRE_          : 0);
 
-	regex = pcre_compile (pattern, options, &error, &erroffset, NULL);
+	regex = pcre_compile (re_data.pattern, re_data.options, &re_data.error, &re_data.erroffset, NULL);
 
 	if ( regex == NULL )
 	{
-		message = g_new(gchar, (strlen(_("Error: %s")) + strlen(_(error))));
-		g_sprintf(message, _("Error: %s"), error);
+		message = g_new(gchar, (strlen(_("Error: %s")) + strlen(_(re_data.error))));
+		g_sprintf(message, _("Error: %s"), re_data.error);
 		gtk_label_set_text(GTK_LABEL(main_widgets.lbl_pattern_status), message);
-		set_text_view_tag_by_offset_and_name(GTK_TEXT_VIEW(main_widgets.tv_pattern), erroffset-1, -1, "error_text");
-		g_printf("%i\n", erroffset);
-		//set_gtk_text_view_cursor_position(GTK_TEXT_VIEW(main_ui.view_regex), erroffset);
+		set_text_view_tag_by_offset_and_name(GTK_TEXT_VIEW(main_widgets.tv_pattern), re_data.erroffset-1, -1, "error_text");
+		g_printf("%i\n", re_data.erroffset);
 		g_free(message);
+
 		return;
 	}
+
 	gtk_label_set_text(GTK_LABEL(main_widgets.lbl_pattern_status), _("No errors found."));
 
-	result_count = pcre_exec (regex, NULL, subject, (int)strlen(subject), 0, 0, result_vector, MAX_RESULTS);
+	re_data.result_count = pcre_exec (regex, NULL, re_data.subject, (int)strlen(re_data.subject), 0, 0, re_data.result_arr, MAX_RESULTS);
 
-	if ( result_count < 0 )
+	if ( re_data.result_count < 0 )
 	{
-		switch ( result_count )
+		switch ( re_data.result_count )
 		{
 			case PCRE_ERROR_NOMATCH:
 				gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), _("No match found."));
@@ -166,7 +170,7 @@ void on_btn_test_pattern_clicked (GtkButton *button, gpointer user_data)
 		return;
 	}
 
-	if ( !(result_count - 1) )
+	if ( !(re_data.result_count - 1) )
 	{
 		message = g_new(gchar, (strlen(_("No matches found.")) ));
 		g_sprintf(message, _("No matches found."));
@@ -176,21 +180,19 @@ void on_btn_test_pattern_clicked (GtkButton *button, gpointer user_data)
 	else
 	{
 		message = g_new(gchar, (strlen(_("%i matches found between offsets %i and %i")) + 16)); /* 16 = 4 for each integer */
-		g_sprintf(message, _("%i matches found between offsets %i and %i."), (result_count-1), result_vector[0], result_vector[1]);
+		g_sprintf(message, _("%i matches found between offsets %i and %i."), (re_data.result_count-1), re_data.result_arr[0], re_data.result_arr[1]);
 		gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), message);
 		g_free(message);
 	}
 
 	clear_text_view_tags(GTK_TEXT_VIEW(main_widgets.tv_subject));
 
-	for ( i = 1; i < result_count; i++ )
+	for ( i = 1; i < re_data.result_count; i++ )
 	{
-		//set_text_view_tag_by_offset_and_name(GTK_TEXT_VIEW(main_widgets.tv_subject), \
-//			result_vector[i*2], result_vector[i*2+1], (i % 2 ? "matched_text0" : "matched_text1"));
-		highlight_substring(result_vector[i*2], result_vector[i*2+1]);
+		highlight_substring(re_data.result_arr[i*2], re_data.result_arr[i*2+1]);
 	}
 
-	populate_substring_highlight_list (result_count, result_vector);
+	populate_substring_highlight_list ();
 }
 
 void on_btn_show_panel_clicked (GtkButton *button, gpointer user_data)
@@ -209,17 +211,47 @@ void on_btn_show_panel_clicked (GtkButton *button, gpointer user_data)
 void on_cbo_substring_list_changed (GtkComboBox *combobox, gpointer user_data)
 {
 	GtkTreeIter *iter;
+	GtkTreeIter *first;
 	GtkTreeModel *model;
 	GValue gvalue = {0,};
 	int start, end;
+	int i;
 
 
 	iter  = g_new(GtkTreeIter, 1);
+	first = g_new(GtkTreeIter, 1);
+
 	model = gtk_combo_box_get_model(combobox);
 
 	if ( !gtk_combo_box_get_active_iter(combobox, iter) )
 	{
 		return;
+	}
+
+	clear_text_view_tags(GTK_TEXT_VIEW(main_widgets.tv_subject));
+
+	/* Fetches the first iter, so we can compare to the selected one to see if is the "all substrings" option */
+	if ( gtk_tree_model_get_iter_first(model, first) )
+	{
+		gchar *str1, *str2;
+
+		gtk_tree_model_get_value(model, first, 0, &gvalue);
+		str1 = (gchar*) g_value_get_string(&gvalue);
+		g_value_unset(&gvalue);
+
+		gtk_tree_model_get_value(model, iter, 0, &gvalue);
+		str2 = (gchar*) g_value_get_string(&gvalue);
+		g_value_unset(&gvalue);
+
+		if ( g_strcmp0(str1, str2) == 0 )
+		{
+			for ( i = 1; i < re_data.result_count; i++ )
+			{
+				highlight_substring(re_data.result_arr[i*2], re_data.result_arr[i*2+1]);
+			}
+
+			return;
+		}
 	}
 
 	gtk_tree_model_get_value(model, iter, 1, &gvalue);
@@ -230,11 +262,6 @@ void on_cbo_substring_list_changed (GtkComboBox *combobox, gpointer user_data)
 	end = g_value_get_int(&gvalue);
 	g_value_unset(&gvalue);
 
-	clear_text_view_tags(GTK_TEXT_VIEW(main_widgets.tv_subject));
-	highlight_substring (start, end);
-
-	g_printf("%i - %i\n", start, end);
-
-
+	highlight_substring(start, end);
 }
 

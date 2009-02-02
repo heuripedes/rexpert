@@ -2,7 +2,7 @@
  *      callbacks.c
  *
  *      Copyright 2008 Higor Eurípedes <heuripedes@gmail.com>
- *      Copyright 2008 Felipe Pena     <@gmail.com>
+ *      Copyright 2008 Felipe Pena     <felipensp@gmail.com>
  *
  *      This program is free software; you can redistribute it and/or modify
  *      it under the terms of the GNU General Public License as published by
@@ -124,7 +124,7 @@ void on_btn_test_pattern_clicked (GtkButton *button, gpointer user_data)
 {
 	pcre       *regex;
 	gchar      *message;
-	int i;
+	int i, str_offset = 0, matches = 0, is_global = 0;
 
 	re_data.subject = get_text_view_text(GTK_TEXT_VIEW(main_widgets.tv_subject));
 	re_data.pattern = get_text_view_text(GTK_TEXT_VIEW(main_widgets.tv_pattern));
@@ -133,7 +133,7 @@ void on_btn_test_pattern_clicked (GtkButton *button, gpointer user_data)
 	re_data.options += (IS_CHECKED(main_widgets.chk_mod_m) ? PCRE_MULTILINE : 0);
 	re_data.options += (IS_CHECKED(main_widgets.chk_mod_s) ? PCRE_DOTALL    : 0);
 	re_data.options += (IS_CHECKED(main_widgets.chk_mod_x) ? PCRE_EXTENDED  : 0);
-//	re_data.options += (IS_CHECKED(main_widgets.chk_mod_g) ? PCRE_          : 0);
+	is_global = IS_CHECKED(main_widgets.chk_mod_g);
 
 	regex = pcre_compile (re_data.pattern, re_data.options, &re_data.error, &re_data.erroffset, NULL);
 
@@ -150,49 +150,55 @@ void on_btn_test_pattern_clicked (GtkButton *button, gpointer user_data)
 	}
 
 	gtk_label_set_text(GTK_LABEL(main_widgets.lbl_pattern_status), _("No errors found."));
-
-	re_data.result_count = pcre_exec (regex, NULL, re_data.subject, (int)strlen(re_data.subject), 0, 0, re_data.result_arr, MAX_RESULTS);
-
-	if ( re_data.result_count < 0 )
-	{
-		switch ( re_data.result_count )
-		{
-			case PCRE_ERROR_NOMATCH:
-				gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), _("No match found."));
-				break;
-			case PCRE_ERROR_NOMEMORY:
-				gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), _("No enought memory avaliable."));
-				break;
-			default:
-				gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), _("Unknown error."));
-				break;
-		}
-		return;
-	}
-
-	if ( !(re_data.result_count - 1) )
-	{
-		message = g_new(gchar, (strlen(_("No matches found.")) ));
-		g_sprintf(message, _("No matches found."));
-		gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), message);
-		g_free(message);
-	}
-	else
-	{
-		message = g_new(gchar, (strlen(_("%i matches found between offsets %i and %i")) + 16)); /* 16 = 4 for each integer */
-		g_sprintf(message, _("%i matches found between offsets %i and %i."), (re_data.result_count-1), re_data.result_arr[0], re_data.result_arr[1]);
-		gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), message);
-		g_free(message);
-	}
-
+	
 	clear_text_view_tags(GTK_TEXT_VIEW(main_widgets.tv_subject));
+	
+	do {
+		re_data.result_count = pcre_exec (regex, NULL, re_data.subject, strlen(re_data.subject), str_offset, 0, re_data.result_arr, MAX_RESULTS);
 
-	for ( i = 1; i < re_data.result_count; i++ )
-	{
-		highlight_substring(re_data.result_arr[i*2], re_data.result_arr[i*2+1]);
+		if ( re_data.result_count < 0 )
+		{
+			switch ( re_data.result_count )
+			{
+				case PCRE_ERROR_NOMATCH:
+					if (!matches) {
+						gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), _("No match found."));
+					}
+					break;
+				case PCRE_ERROR_NOMEMORY:
+					gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), _("No enought memory avaliable."));
+					break;
+				default:
+					gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), _("Unknown error."));
+					break;
+			}
+			break;
+		}
+		matches++;
+		
+		for ( i = 0; i < re_data.result_count; i++ )
+		{
+			if (i == 0 && re_data.result_count > 1) {
+				/* Nao possui subpatterns */
+				continue;
+			}
+			highlight_substring(re_data.result_arr[i<<1], re_data.result_arr[(i<<1)+1]);
+		}
+		
+		str_offset = re_data.result_arr[1];
+
+		/* 
+		 * message = g_new(gchar, (strlen(_("%i matches found between offsets %i and %i")) + 16));
+		 * g_sprintf(message, _("%i matches found between offsets %i and %i."), (re_data.result_count-1), re_data.result_arr[0], re_data.result_arr[1]);
+		 * gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), message); 
+		 * g_free(message);
+		 */
+	} while (is_global);
+	
+	if (matches) {
+		gtk_label_set_text(GTK_LABEL(main_widgets.lbl_subject_status), _("Matched!"));
+		populate_substring_highlight_list ();
 	}
-
-	populate_substring_highlight_list ();
 }
 
 void on_btn_show_panel_clicked (GtkButton *button, gpointer user_data)

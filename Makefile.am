@@ -28,5 +28,10 @@ dist-hook:
 	  done \
 	fi
 
+really-clean:
+	-while read i; do \
+		echo "[rm] $$i"; \
+		find . -iname "$$i" -delete 2&> /dev/null; \
+	done < .bzrignore
 
 ACLOCAL_AMFLAGS = -I m4

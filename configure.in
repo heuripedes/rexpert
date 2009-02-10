@@ -16,9 +16,9 @@ pkg_modules2="libpcre >= 7.0"
 pkg_modules3="glib-2.0 >= 2.10.0"
 
 AC_CHECK_FUNCS([strlen])
-PKG_CHECK_MODULES([PACKAGE], [$pkg_modules, $pkg_modules2, $pkg_modules3])
-AC_SUBST(PACKAGE_CFLAGS)
-AC_SUBST(PACKAGE_LIBS)
+PKG_CHECK_MODULES([PACKAGES], [$pkg_modules, $pkg_modules2, $pkg_modules3])
+AC_SUBST(PACKAGES_CFLAGS)
+AC_SUBST(PACKAGES_LIBS)
 
 #GETTEXT_PACKAGE=rexpert
 #AC_SUBST(GETTEXT_PACKAGE)

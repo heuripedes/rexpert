@@ -15,5 +15,6 @@ rexpert_SOURCES = \
 	interface.c interface.h \
 	callbacks.c callbacks.h
 
-rexpert_LDADD = @PACKAGES_LIBS@ $(INTLLIBS)
+#rexpert_LDADD = @PACKAGES_LIBS@ $(INTLLIBS)
+rexpert_LDADD = @PACKAGES_LIBS@
 
